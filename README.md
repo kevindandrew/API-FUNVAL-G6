@@ -89,6 +89,14 @@ Para acceder a las funciones protegidas, necesitas un Token.
     - Copia este token.
     - En Swagger, haz clic en el botón **Authorize 🔓** (arriba a la derecha) y pégalo.
 
+### 👥 Gestión de Usuarios (`/users`)
+
+- **Crear Usuario (Admin)**: `POST /users/`
+  - Solo Admins. Permite crear otros admins.
+- **Actualizar Perfil**: `PUT /users/{id}`
+  - **Admins**: Pueden editar cualquier usuario y cambiar roles.
+  - **Clientes**: Solo pueden editar su propio perfil (Nombre, Email, Password). NO pueden cambiar su rol.
+
 ### 📦 Módulo 2: Productos (`/products`)
 
 _Solo los administradores pueden crear, editar o borrar productos._
