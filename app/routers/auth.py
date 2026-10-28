@@ -1,5 +1,6 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
@@ -11,6 +12,9 @@ from app.auth import (
     get_current_user,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
+from app.utils.cloudinary_utils import upload_image
+
+MAX_AVATAR_SIZE = 5 * 1024 * 1024  # 5MB
 
 router = APIRouter(
     prefix="/auth",
@@ -92,4 +96,42 @@ def get_profile(current_user: User = Depends(get_current_user)):
     - Utilidad: Verificar si el token sigue válido
     - Útil para recargar datos del usuario al refrescar la página
     """
+    return current_user
+
+@router.put("/perfil", response_model=UserProfile)
+def update_profile(
+    name: Optional[str] = Form(None),
+    foto: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    🖼️ Actualizar Mi Perfil (con foto)
+    
+    - Requiere Token (Usuario debe estar logueado)
+    - Se envía como multipart/form-data (FormData en el frontend)
+    - Campos opcionales: 'name' (texto) y 'foto' (imagen, máx 5MB)
+    - La foto se sube a Cloudinary y se guarda su URL en 'avatar_url'
+    """
+    if name is not None:
+        name = name.strip()
+        if len(name) < 3:
+            raise HTTPException(400, detail="El nombre debe tener al menos 3 caracteres")
+        current_user.name = name
+    
+    if foto is not None and foto.filename:
+        if not foto.content_type or not foto.content_type.startswith("image/"):
+            raise HTTPException(400, detail="El archivo debe ser una imagen")
+        
+        contents = foto.file.read()
+        if len(contents) > MAX_AVATAR_SIZE:
+            raise HTTPException(400, detail="La imagen no puede superar los 5MB")
+        
+        result = upload_image(contents, folder="funval_g6_avatars")
+        if not result:
+            raise HTTPException(500, detail="Error al subir la imagen")
+        current_user.avatar_url = result.get("secure_url")
+    
+    db.commit()
+    db.refresh(current_user)
     return current_user

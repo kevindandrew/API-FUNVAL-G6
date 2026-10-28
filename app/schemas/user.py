@@ -18,6 +18,7 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     id: int
+    avatar_url: Optional[str] = None
     created_at: datetime
     
     class Config:

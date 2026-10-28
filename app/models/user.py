@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime
 from sqlalchemy.sql import func
 from app.database import Base
 
@@ -10,4 +10,5 @@ class User(Base):
     password = Column(String(255), nullable=False)
     name = Column(String(100), nullable=False)
     role = Column(String(20), default='cliente', nullable=False)
+    avatar_url = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

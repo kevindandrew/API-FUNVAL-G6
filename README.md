@@ -88,6 +88,12 @@ Para acceder a las funciones protegidas, necesitas un Token.
     - Te devolverá un `access_token`.
     - Copia este token.
     - En Swagger, haz clic en el botón **Authorize 🔓** (arriba a la derecha) y pégalo.
+3.  **Mi Perfil**: `GET /auth/me`
+    - Devuelve tus datos, incluida tu foto (`avatar_url`, puede ser `null`).
+4.  **Actualizar Mi Perfil / Foto**: `PUT /auth/perfil`
+    - Requiere token. Se envía como `multipart/form-data` (usa `FormData` en el frontend).
+    - Campos opcionales: `name` (texto, mín. 3 caracteres) y `foto` (imagen, máx. 5MB).
+    - La foto se sube a Cloudinary y el endpoint devuelve el perfil actualizado con el nuevo `avatar_url`.
 
 ### 👥 Gestión de Usuarios (`/users`)
 

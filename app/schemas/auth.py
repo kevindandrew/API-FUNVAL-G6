@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 class UserRegister(BaseModel):
     """Schema para registro de usuario"""
@@ -24,6 +25,7 @@ class UserProfile(BaseModel):
     email: str
     name: str
     role: str
+    avatar_url: Optional[str] = None
     
     class Config:
         from_attributes = True
